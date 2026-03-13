@@ -142,3 +142,17 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kt
+
+# Android
+android/build/
+android/.gradle/
+*.keystore
