@@ -15,10 +15,13 @@ const TREND_W = (width - 60) / 2;
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 
-const HISTORY = [
-  { id: '1', title: 'Starboy', artist: 'The Weeknd', plays: '40M plays' },
-  { id: '2', title: 'Blinding Lights', artist: 'The Weeknd', plays: '80M plays' },
-  { id: '3', title: 'Teenage Dirtbag', artist: 'Wheatus', plays: '12M plays' },
+const RECENTLY_PLAYED = [
+  { id: '1', title: 'Starboy', artist: 'The Weeknd' },
+  { id: '2', title: 'Blinding Lights', artist: 'The Weeknd' },
+  { id: '3', title: 'Teenage Dirtbag', artist: 'Wheatus' },
+  { id: '4', title: 'Levitating', artist: 'Dua Lipa' },
+  { id: '5', title: 'Stay', artist: 'Kid LAROI' },
+  { id: '6', title: 'Peaches', artist: 'Justin Bieber' },
 ];
 
 const NEW_RELEASES = [
@@ -79,7 +82,6 @@ function ArtPlaceholder({ iconSize = 28, iconName = 'music-note', bgColor, iconC
 
 export default function HomeScreen({ navigation }: any) {
   const { colors, mode } = useTheme();
-  const [activeHistory, setActiveHistory] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
   const [following, setFollowing] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -110,174 +112,170 @@ export default function HomeScreen({ navigation }: any) {
           </View>
 
           {/* ── Greeting ────────────────────────────────────────────────────── */}
-          <View style={styles.greetingSection}>
+          <View>
             <Text style={[styles.greetingText, { color: colors.text }]}>{getGreeting()}, Rey 👋</Text>
             <Text style={[styles.greetingSubtext, { color: colors.textSecondary }]}>What are you feeling today?</Text>
           </View>
 
-          {/* ── New Releases ────────────────────────────────────────────────── */}
-          <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>New Releases</Text>
-            <TouchableOpacity><Text style={[styles.seeAll, { color: colors.accent }]}>See all</Text></TouchableOpacity>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hRow}>
-            {NEW_RELEASES.map((r) => (
-              <TouchableOpacity key={r.id} style={[styles.releaseCard, ...card]} activeOpacity={0.85}>
-                <ArtPlaceholder
-                  iconSize={26} bgColor={colors.bgCard} iconColor={colors.textMuted}
-                  style={{ width: RELEASE_W - 20, height: RELEASE_W - 20, borderRadius: 14 }}
-                />
-                <View style={[styles.newBadge, { backgroundColor: colors.accent }]}>
-                  <Text style={styles.newBadgeText}>NEW</Text>
-                </View>
-                <View style={styles.releaseInfo}>
-                  <Text style={[styles.releaseTitle, { color: colors.text }]} numberOfLines={1}>{r.title}</Text>
-                  <Text style={[styles.releaseArtist, { color: colors.textSecondary }]} numberOfLines={1}>{r.artist}</Text>
-                  <View style={styles.releaseMeta}>
-                    <Text style={[styles.releaseType, { color: colors.accent }]}>{r.type}</Text>
-                    <Text style={[styles.releaseTime, { color: colors.textMuted }]}>{r.timeAgo}</Text>
+          {/* ── Recently Played ─────────────────────────────────────────────── */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Recently Played</Text>
+              <TouchableOpacity><Text style={[styles.seeAll, { color: colors.accent }]}>See all</Text></TouchableOpacity>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.recentRow}>
+              {RECENTLY_PLAYED.map((track) => (
+                <TouchableOpacity
+                  key={track.id}
+                  style={[styles.recentChip, { backgroundColor: colors.bgElevated, borderColor: colors.border }]}
+                  onPress={() => navigation.navigate('Player')}
+                  activeOpacity={0.8}
+                >
+                  <View style={[styles.recentArt, { backgroundColor: colors.bgCard }]}>
+                    <MaterialCommunityIcons name="music-note" size={14} color={colors.textMuted} />
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+                  <View style={styles.recentInfo}>
+                    <Text style={[styles.recentTitle, { color: colors.text }]} numberOfLines={1}>{track.title}</Text>
+                    <Text style={[styles.recentArtist, { color: colors.textMuted }]} numberOfLines={1}>{track.artist}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
 
-          {/* ── History ─────────────────────────────────────────────────────── */}
-          <View style={[styles.sectionHeader, { marginTop: 28 }]}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>History</Text>
-          </View>
-          <ScrollView
-            horizontal pagingEnabled showsHorizontalScrollIndicator={false}
-            snapToInterval={CARD_WIDTH + 16} decelerationRate="fast"
-            contentContainerStyle={styles.hRow}
-            onMomentumScrollEnd={(e) => setActiveHistory(Math.round(e.nativeEvent.contentOffset.x / (CARD_WIDTH + 16)))}
-          >
-            {HISTORY.map((song) => (
-              <TouchableOpacity key={song.id} style={[styles.historyCard, ...card]} activeOpacity={0.88}>
-                <ArtPlaceholder
-                  iconSize={32} bgColor={colors.bgCard} iconColor={colors.textMuted}
-                  style={{ height: 130 }}
-                />
-                <View style={styles.historyInfo}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.historyTitle, { color: colors.text }]} numberOfLines={1}>{song.title}</Text>
-                    <Text style={[styles.historyArtist, { color: colors.textSecondary }]} numberOfLines={1}>{song.artist}</Text>
-                    <Text style={[styles.historyPlays, { color: colors.textMuted }]}>{song.plays}</Text>
+          {/* ── New Releases ────────────────────────────────────────────────── */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>New Releases</Text>
+              <TouchableOpacity><Text style={[styles.seeAll, { color: colors.accent }]}>See all</Text></TouchableOpacity>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hRow}>
+              {NEW_RELEASES.map((r) => (
+                <TouchableOpacity key={r.id} style={[styles.releaseCard, ...card]} activeOpacity={0.85}>
+                  <ArtPlaceholder
+                    iconSize={26} bgColor={colors.bgCard} iconColor={colors.textMuted}
+                    style={{ width: RELEASE_W - 20, height: RELEASE_W - 20, borderRadius: 14 }}
+                  />
+                  <View style={[styles.newBadge, { backgroundColor: colors.accent }]}>
+                    <Text style={styles.newBadgeText}>NEW</Text>
                   </View>
-                  <TouchableOpacity
-                    style={[styles.chipBtn, { backgroundColor: colors.accentMuted, borderColor: colors.accentBorder }]}
-                    onPress={() => navigation.navigate('Player')}
-                  >
-                    <Text style={[styles.chipBtnText, { color: colors.accent }]}>Play</Text>
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-          <View style={styles.dotsRow}>
-            {HISTORY.map((_, i) => (
-              <View key={i} style={[styles.dot, { backgroundColor: i === activeHistory ? colors.accent : colors.border }, i === activeHistory && styles.dotActive]} />
-            ))}
+                  <View style={styles.releaseInfo}>
+                    <Text style={[styles.releaseTitle, { color: colors.text }]} numberOfLines={1}>{r.title}</Text>
+                    <Text style={[styles.releaseArtist, { color: colors.textSecondary }]} numberOfLines={1}>{r.artist}</Text>
+                    <View style={styles.releaseMeta}>
+                      <Text style={[styles.releaseType, { color: colors.accent }]}>{r.type}</Text>
+                      <Text style={[styles.releaseTime, { color: colors.textMuted }]}>{r.timeAgo}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
 
           {/* ── Artist Spotlight ────────────────────────────────────────────── */}
-          <View style={[styles.sectionHeader, { marginTop: 28 }]}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Artist Spotlight</Text>
-          </View>
-          <TouchableOpacity style={[styles.spotlightCard, ...card]} activeOpacity={0.88}>
-            <ArtPlaceholder
-              iconSize={40} iconName="account-music" bgColor={colors.bgCard} iconColor={colors.textMuted}
-              style={{ height: 180 }}
-            />
-            <View style={styles.spotlightInfo}>
-              <View style={styles.spotlightStats}>
-                <View style={[styles.statChip, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
-                  <MaterialCommunityIcons name="account-multiple" size={12} color={colors.textSecondary} />
-                  <Text style={[styles.statText, { color: colors.textSecondary }]}>{SPOTLIGHT.followers} followers</Text>
-                </View>
-                <View style={[styles.statChip, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
-                  <MaterialCommunityIcons name="music-note" size={12} color={colors.textSecondary} />
-                  <Text style={[styles.statText, { color: colors.textSecondary }]}>{SPOTLIGHT.tracks} tracks</Text>
-                </View>
-              </View>
-              <View style={styles.spotlightBottom}>
-                <View style={{ flex: 1, marginRight: 12 }}>
-                  <Text style={[styles.spotlightName, { color: colors.text }]}>{SPOTLIGHT.name}</Text>
-                  <Text style={[styles.spotlightGenre, { color: colors.textSecondary }]}>{SPOTLIGHT.genre}</Text>
-                  <Text style={[styles.spotlightBio, { color: colors.textMuted }]} numberOfLines={2}>{SPOTLIGHT.bio}</Text>
-                </View>
-                <TouchableOpacity
-                  style={[styles.followBtn, following
-                    ? { backgroundColor: colors.accentMuted, borderColor: colors.accentBorder }
-                    : { backgroundColor: colors.accent, borderColor: colors.accent }]}
-                  onPress={() => setFollowing(!following)}
-                  activeOpacity={0.8}
-                >
-                  <Text style={[styles.followBtnText, { color: following ? colors.accent : '#fff' }]}>
-                    {following ? 'Following' : 'Follow'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Artist Spotlight</Text>
             </View>
-          </TouchableOpacity>
+            <TouchableOpacity style={[styles.spotlightCard, ...card]} activeOpacity={0.88}>
+              <ArtPlaceholder
+                iconSize={40} iconName="account-music" bgColor={colors.bgCard} iconColor={colors.textMuted}
+                style={{ height: 180 }}
+              />
+              <View style={styles.spotlightInfo}>
+                <View style={styles.spotlightStats}>
+                  <View style={[styles.statChip, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+                    <MaterialCommunityIcons name="account-multiple" size={12} color={colors.textSecondary} />
+                    <Text style={[styles.statText, { color: colors.textSecondary }]}>{SPOTLIGHT.followers} followers</Text>
+                  </View>
+                  <View style={[styles.statChip, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+                    <MaterialCommunityIcons name="music-note" size={12} color={colors.textSecondary} />
+                    <Text style={[styles.statText, { color: colors.textSecondary }]}>{SPOTLIGHT.tracks} tracks</Text>
+                  </View>
+                </View>
+                <View style={styles.spotlightBottom}>
+                  <View style={{ flex: 1, marginRight: 12 }}>
+                    <Text style={[styles.spotlightName, { color: colors.text }]}>{SPOTLIGHT.name}</Text>
+                    <Text style={[styles.spotlightGenre, { color: colors.textSecondary }]}>{SPOTLIGHT.genre}</Text>
+                    <Text style={[styles.spotlightBio, { color: colors.textMuted }]} numberOfLines={2}>{SPOTLIGHT.bio}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={[styles.followBtn, following
+                      ? { backgroundColor: colors.accentMuted, borderColor: colors.accentBorder }
+                      : { backgroundColor: colors.accent, borderColor: colors.accent }]}
+                    onPress={() => setFollowing(!following)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.followBtnText, { color: following ? colors.accent : '#fff' }]}>
+                      {following ? 'Following' : 'Follow'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
 
           {/* ── Activity Feed ────────────────────────────────────────────────── */}
-          <View style={[styles.sectionHeader, { marginTop: 28 }]}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Activity</Text>
-            <TouchableOpacity><Text style={[styles.seeAll, { color: colors.accent }]}>See all</Text></TouchableOpacity>
-          </View>
-          <View style={styles.feedList}>
-            {ACTIVITY_FEED.map((post, idx) => (
-              <View key={post.id}>
-                <TouchableOpacity style={[styles.feedPost, ...card]} activeOpacity={0.8}>
-                  <View style={[styles.feedAvatarCircle, { backgroundColor: colors.bgCard }]}>
-                    <MaterialCommunityIcons name="account-music" size={18} color={colors.textMuted} />
-                  </View>
-                  <View style={styles.feedContent}>
-                    <View style={styles.feedMeta}>
-                      <Text style={[styles.feedArtist, { color: colors.text }]}>{post.artist}</Text>
-                      <Text style={[styles.feedTime, { color: colors.textMuted }]}>{post.timeAgo}</Text>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Activity</Text>
+              <TouchableOpacity><Text style={[styles.seeAll, { color: colors.accent }]}>See all</Text></TouchableOpacity>
+            </View>
+            <View style={styles.feedList}>
+              {ACTIVITY_FEED.map((post, idx) => (
+                <View key={post.id}>
+                  <TouchableOpacity style={[styles.feedPost, ...card]} activeOpacity={0.8}>
+                    <View style={[styles.feedAvatarCircle, { backgroundColor: colors.bgCard }]}>
+                      <MaterialCommunityIcons name="account-music" size={18} color={colors.textMuted} />
                     </View>
-                    <Text style={[styles.feedText, { color: colors.textSecondary }]}>{post.text}</Text>
-                    <View style={styles.feedActions}>
-                      <TouchableOpacity style={styles.feedAction}>
-                        <MaterialCommunityIcons name="heart-outline" size={15} color={colors.textMuted} />
-                        <Text style={[styles.feedActionText, { color: colors.textMuted }]}>{post.likes}</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.feedAction}>
-                        <MaterialCommunityIcons name="comment-outline" size={15} color={colors.textMuted} />
-                        <Text style={[styles.feedActionText, { color: colors.textMuted }]}>{post.comments}</Text>
-                      </TouchableOpacity>
+                    <View style={styles.feedContent}>
+                      <View style={styles.feedMeta}>
+                        <Text style={[styles.feedArtist, { color: colors.text }]}>{post.artist}</Text>
+                        <Text style={[styles.feedTime, { color: colors.textMuted }]}>{post.timeAgo}</Text>
+                      </View>
+                      <Text style={[styles.feedText, { color: colors.textSecondary }]}>{post.text}</Text>
+                      <View style={styles.feedActions}>
+                        <TouchableOpacity style={styles.feedAction}>
+                          <MaterialCommunityIcons name="heart-outline" size={15} color={colors.textMuted} />
+                          <Text style={[styles.feedActionText, { color: colors.textMuted }]}>{post.likes}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.feedAction}>
+                          <MaterialCommunityIcons name="comment-outline" size={15} color={colors.textMuted} />
+                          <Text style={[styles.feedActionText, { color: colors.textMuted }]}>{post.comments}</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-                {idx < ACTIVITY_FEED.length - 1 && <View style={{ height: 10 }} />}
-              </View>
-            ))}
+                  </TouchableOpacity>
+                  {idx < ACTIVITY_FEED.length - 1 && <View style={{ height: 10 }} />}
+                </View>
+              ))}
+            </View>
           </View>
 
           {/* ── Now Trending ────────────────────────────────────────────────── */}
-          <View style={[styles.sectionHeader, { marginTop: 28 }]}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Now Trending</Text>
-            <TouchableOpacity><Text style={[styles.seeAll, { color: colors.accent }]}>See all</Text></TouchableOpacity>
-          </View>
-          <View style={styles.trendingGrid}>
-            {TRENDING.map((song) => (
-              <TouchableOpacity key={song.id} style={[styles.trendingCard, ...card]} activeOpacity={0.85}>
-                <ArtPlaceholder
-                  iconSize={24} bgColor={colors.bgCard} iconColor={colors.textMuted}
-                  style={{ height: TREND_W * 0.7 }}
-                />
-                <View style={styles.trendingInfo}>
-                  <Text style={[styles.trendingTitle, { color: colors.text }]} numberOfLines={1}>{song.title}</Text>
-                  <Text style={[styles.trendingArtist, { color: colors.textSecondary }]} numberOfLines={1}>{song.artist}</Text>
-                  <View style={styles.trendingPlaysRow}>
-                    <MaterialCommunityIcons name="play-circle-outline" size={12} color={colors.textMuted} />
-                    <Text style={[styles.trendingPlays, { color: colors.textMuted }]}>{song.plays}</Text>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Now Trending</Text>
+              <TouchableOpacity><Text style={[styles.seeAll, { color: colors.accent }]}>See all</Text></TouchableOpacity>
+            </View>
+            <View style={styles.trendingGrid}>
+              {TRENDING.map((song) => (
+                <TouchableOpacity key={song.id} style={[styles.trendingCard, ...card]} activeOpacity={0.85}>
+                  <ArtPlaceholder
+                    iconSize={24} bgColor={colors.bgCard} iconColor={colors.textMuted}
+                    style={{ height: TREND_W * 0.7 }}
+                  />
+                  <View style={styles.trendingInfo}>
+                    <Text style={[styles.trendingTitle, { color: colors.text }]} numberOfLines={1}>{song.title}</Text>
+                    <Text style={[styles.trendingArtist, { color: colors.textSecondary }]} numberOfLines={1}>{song.artist}</Text>
+                    <View style={styles.trendingPlaysRow}>
+                      <MaterialCommunityIcons name="play-circle-outline" size={12} color={colors.textMuted} />
+                      <Text style={[styles.trendingPlays, { color: colors.textMuted }]}>{song.plays}</Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
 
           <View style={{ height: 140 }} />
@@ -315,16 +313,16 @@ export default function HomeScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scroll: { paddingTop: 56, paddingHorizontal: 24 },
+  scroll: { paddingTop: 56, paddingHorizontal: 24, gap: 28, paddingBottom: 0 },
 
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   avatarCircle: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
 
-  greetingSection: { marginBottom: 28 },
   greetingText: { fontSize: 26, fontWeight: '800', letterSpacing: -0.5 },
   greetingSubtext: { fontSize: 14, marginTop: 4 },
 
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
+  section: { gap: 14 },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   sectionTitle: { fontSize: 20, fontWeight: '800', letterSpacing: -0.3 },
   seeAll: { fontSize: 13, fontWeight: '600' },
 
@@ -334,6 +332,18 @@ const styles = StyleSheet.create({
   chipBtnText: { fontSize: 12, fontWeight: '700' },
 
   hRow: { gap: 12, paddingRight: 24 },
+
+  // Recently Played
+  recentRow: { gap: 10, paddingRight: 24 },
+  recentChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    paddingVertical: 8, paddingHorizontal: 10,
+    borderRadius: 16, borderWidth: 1, width: 180,
+  },
+  recentArt: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  recentInfo: { flex: 1 },
+  recentTitle: { fontSize: 12, fontWeight: '700' },
+  recentArtist: { fontSize: 11, marginTop: 1 },
 
   releaseCard: { width: RELEASE_W, padding: 10 },
   newBadge: { position: 'absolute', top: 16, left: 16, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
@@ -345,14 +355,6 @@ const styles = StyleSheet.create({
   releaseType: { fontSize: 10, fontWeight: '600' },
   releaseTime: { fontSize: 10 },
 
-  historyCard: { width: CARD_WIDTH },
-  historyInfo: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 12 },
-  historyTitle: { fontSize: 16, fontWeight: '700', letterSpacing: -0.2 },
-  historyArtist: { fontSize: 13, marginTop: 2 },
-  historyPlays: { fontSize: 11, marginTop: 3 },
-  dotsRow: { flexDirection: 'row', gap: 5, marginTop: 12, alignSelf: 'center' },
-  dot: { height: 6, width: 6, borderRadius: 3 },
-  dotActive: { width: 18 },
 
   spotlightCard: { width: '100%' },
   spotlightInfo: { padding: 16, gap: 12 },
